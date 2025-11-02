@@ -1,7 +1,58 @@
-import { useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useState, useEffect } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import './App.css'
+
+function CameraController() {
+  const { camera } = useThree()
+  const zoom = useRef(6)
+  const touchDistance = useRef(0)
+
+  useEffect(() => {
+    const handleWheel = (event) => {
+      event.preventDefault()
+      const delta = event.deltaY * 0.01
+      zoom.current = Math.max(3, Math.min(15, zoom.current + delta))
+    }
+
+    const handleTouchStart = (event) => {
+      if (event.touches.length === 2) {
+        const dx = event.touches[0].clientX - event.touches[1].clientX
+        const dy = event.touches[0].clientY - event.touches[1].clientY
+        touchDistance.current = Math.sqrt(dx * dx + dy * dy)
+      }
+    }
+
+    const handleTouchMove = (event) => {
+      if (event.touches.length === 2) {
+        event.preventDefault()
+        const dx = event.touches[0].clientX - event.touches[1].clientX
+        const dy = event.touches[0].clientY - event.touches[1].clientY
+        const newDistance = Math.sqrt(dx * dx + dy * dy)
+
+        const delta = (touchDistance.current - newDistance) * 0.02
+        zoom.current = Math.max(3, Math.min(15, zoom.current + delta))
+        touchDistance.current = newDistance
+      }
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('touchstart', handleTouchStart)
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [])
+
+  useFrame(() => {
+    camera.position.z += (zoom.current - camera.position.z) * 0.1
+  })
+
+  return null
+}
 
 function Grid() {
   return (
@@ -82,6 +133,7 @@ function App() {
       background: 'linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #2d1b4e 100%)'
     }}>
       <Canvas camera={{ position: [0, 1, 6], fov: 60 }}>
+        <CameraController />
         <ambientLight intensity={0.2} />
         <pointLight position={[5, 5, 5]} intensity={1.5} color="#ff00ff" />
         <pointLight position={[-5, 3, -5]} intensity={1.2} color="#00ffff" />
@@ -108,7 +160,7 @@ function App() {
         fontWeight: 'bold',
         textShadow: '0 0 10px #00ffff'
       }}>
-        Click and drag to rotate the box
+        Click and drag to rotate • Scroll or pinch to zoom
       </div>
     </div>
   )
