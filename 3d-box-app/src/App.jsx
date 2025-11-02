@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import './App.css'
 
@@ -61,8 +62,7 @@ function Grid() {
 }
 
 function Box() {
-  const meshRef = useRef()
-  const edgesRef = useRef()
+  const groupRef = useRef()
   const [isDragging, setIsDragging] = useState(false)
   const [previousMouse, setPreviousMouse] = useState({ x: 0, y: 0 })
   const rotation = useRef({ x: 0, y: 0 })
@@ -89,25 +89,23 @@ function Box() {
     setPreviousMouse({ x: event.clientX, y: event.clientY })
   }
 
-  // Apply rotation
+  // Apply rotation to entire group
   useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = rotation.current.x
-      meshRef.current.rotation.y = rotation.current.y
-      edgesRef.current.rotation.x = rotation.current.x
-      edgesRef.current.rotation.y = rotation.current.y
+    if (groupRef.current) {
+      groupRef.current.rotation.x = rotation.current.x
+      groupRef.current.rotation.y = rotation.current.y
     }
   })
 
   return (
-    <group>
-      <mesh
-        ref={meshRef}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerMove={handlePointerMove}
-        onPointerLeave={handlePointerUp}
-      >
+    <group
+      ref={groupRef}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerUp}
+    >
+      <mesh>
         <boxGeometry args={[2, 2, 2]} />
         <meshStandardMaterial
           color="#ff1493"
@@ -117,10 +115,28 @@ function Box() {
           roughness={0.2}
         />
       </mesh>
-      <lineSegments ref={edgesRef}>
+      <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
         <lineBasicMaterial color="#00ffff" linewidth={2} />
       </lineSegments>
+      <Text
+        position={[0, 0, 1.01]}
+        fontSize={0.5}
+        color="#ffff00"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.05}
+        outlineColor="#ff00ff"
+      >
+        DigitAI Geeks
+        <meshStandardMaterial
+          color="#ffff00"
+          emissive="#ffff00"
+          emissiveIntensity={0.5}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </Text>
     </group>
   )
 }
