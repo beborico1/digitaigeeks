@@ -61,6 +61,56 @@ function Grid() {
   )
 }
 
+function Tree({ position, color = '#ff00ff' }) {
+  return (
+    <group position={position}>
+      {/* Tree trunk */}
+      <mesh position={[0, -1, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 1, 8]} />
+        <meshStandardMaterial
+          color="#4a148c"
+          emissive="#4a148c"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+
+      {/* Tree foliage - 3 cones stacked */}
+      <mesh position={[0, 0, 0]}>
+        <coneGeometry args={[1, 1.5, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.4}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0, 0.6, 0]}>
+        <coneGeometry args={[0.8, 1.2, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.5}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0, 1.1, 0]}>
+        <coneGeometry args={[0.6, 1, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.6}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+    </group>
+  )
+}
+
 function Box() {
   const groupRef = useRef()
   const isDragging = useRef(false)
@@ -167,6 +217,17 @@ function App() {
         <pointLight position={[0, -5, 0]} intensity={0.8} color="#ff1493" />
         <spotLight position={[0, 10, 0]} intensity={2} color="#ff00ff" angle={0.6} penumbra={1} />
         <Grid />
+
+        {/* Trees scattered around the scene */}
+        <Tree position={[-4, -2, -3]} color="#ff00ff" />
+        <Tree position={[5, -2, -2]} color="#00ffff" />
+        <Tree position={[-3, -2, 2]} color="#ff1493" />
+        <Tree position={[4, -2, 1]} color="#ff00ff" />
+        <Tree position={[-6, -2, -1]} color="#00ffff" />
+        <Tree position={[3, -2, -4]} color="#ff1493" />
+        <Tree position={[-2, -2, -5]} color="#ff00ff" />
+        <Tree position={[6, -2, -4]} color="#00ffff" />
+
         <Box />
         <fog attach="fog" args={['#1a0033', 5, 20]} />
       </Canvas>
