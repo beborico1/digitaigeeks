@@ -55,9 +55,20 @@ function CameraController() {
   return null
 }
 
-function Grid() {
+function Floor() {
   return (
-    <gridHelper args={[20, 20, '#ff00ff', '#00ffff']} position={[0, -2, 0]} />
+    <mesh position={[0, -2.5, 0]} receiveShadow>
+      <boxGeometry args={[16, 0.5, 16]} />
+      <meshStandardMaterial
+        color="#1a0033"
+        emissive="#1a0033"
+        emissiveIntensity={0.2}
+        metalness={0.8}
+        roughness={0.3}
+        transparent
+        opacity={0.8}
+      />
+    </mesh>
   )
 }
 
@@ -111,7 +122,63 @@ function Tree({ position, color = '#ff00ff' }) {
   )
 }
 
-function Box() {
+function Boxes() {
+  return (
+    <>
+      {/* First Box */}
+      <mesh position={[-1.5, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial
+          color="#ff1493"
+          emissive="#ff1493"
+          emissiveIntensity={0.2}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </mesh>
+      <lineSegments position={[-1.5, 0, 0]}>
+        <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
+        <lineBasicMaterial color="#00ffff" linewidth={2} />
+      </lineSegments>
+      <Text
+        position={[-1.5, 0, 1.01]}
+        fontSize={0.5}
+        color="#ffff00"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor="#ff00ff"
+      >
+        DigitAI Geeks
+        <meshStandardMaterial
+          color="#ffff00"
+          emissive="#ffff00"
+          emissiveIntensity={0.3}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </Text>
+
+      {/* Second Box */}
+      <mesh position={[1.5, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial
+          color="#00ffff"
+          emissive="#00ffff"
+          emissiveIntensity={0.2}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </mesh>
+      <lineSegments position={[1.5, 0, 0]}>
+        <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
+        <lineBasicMaterial color="#ff00ff" linewidth={2} />
+      </lineSegments>
+    </>
+  )
+}
+
+function Scene() {
   const groupRef = useRef()
   const isDragging = useRef(false)
   const previousMouse = useRef({ x: 0, y: 0 })
@@ -166,38 +233,24 @@ function Box() {
 
   return (
     <group ref={groupRef}>
-      <mesh>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial
-          color="#ff1493"
-          emissive="#ff1493"
-          emissiveIntensity={0.2}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
-        <lineBasicMaterial color="#00ffff" linewidth={2} />
-      </lineSegments>
-      <Text
-        position={[0, 0, 1.01]}
-        fontSize={0.5}
-        color="#ffff00"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#ff00ff"
-      >
-        DigitAI Geeks
-        <meshStandardMaterial
-          color="#ffff00"
-          emissive="#ffff00"
-          emissiveIntensity={0.3}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </Text>
+      {/* Floor */}
+      <Floor />
+
+      {/* Grid on top of floor */}
+      <gridHelper args={[16, 16, '#ff00ff', '#00ffff']} position={[0, -2.24, 0]} />
+
+      {/* Trees */}
+      <Tree position={[-4, -0.75, -3]} color="#ff00ff" />
+      <Tree position={[5, -0.75, -2]} color="#00ffff" />
+      <Tree position={[-3, -0.75, 2]} color="#ff1493" />
+      <Tree position={[4, -0.75, 1]} color="#ff00ff" />
+      <Tree position={[-6, -0.75, -1]} color="#00ffff" />
+      <Tree position={[3, -0.75, -4]} color="#ff1493" />
+      <Tree position={[-2, -0.75, -5]} color="#ff00ff" />
+      <Tree position={[6, -0.75, -4]} color="#00ffff" />
+
+      {/* Boxes */}
+      <Boxes />
     </group>
   )
 }
@@ -216,19 +269,7 @@ function App() {
         <pointLight position={[-5, 3, -5]} intensity={1.2} color="#00ffff" />
         <pointLight position={[0, -5, 0]} intensity={0.8} color="#ff1493" />
         <spotLight position={[0, 10, 0]} intensity={2} color="#ff00ff" angle={0.6} penumbra={1} />
-        <Grid />
-
-        {/* Trees scattered around the scene */}
-        <Tree position={[-4, -2, -3]} color="#ff00ff" />
-        <Tree position={[5, -2, -2]} color="#00ffff" />
-        <Tree position={[-3, -2, 2]} color="#ff1493" />
-        <Tree position={[4, -2, 1]} color="#ff00ff" />
-        <Tree position={[-6, -2, -1]} color="#00ffff" />
-        <Tree position={[3, -2, -4]} color="#ff1493" />
-        <Tree position={[-2, -2, -5]} color="#ff00ff" />
-        <Tree position={[6, -2, -4]} color="#00ffff" />
-
-        <Box />
+        <Scene />
         <fog attach="fog" args={['#1a0033', 5, 20]} />
       </Canvas>
       <div style={{
