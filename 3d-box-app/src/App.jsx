@@ -122,6 +122,67 @@ function Tree({ position, color = '#ff00ff' }) {
   )
 }
 
+function RegularTree({ position, color = '#ff00ff' }) {
+  return (
+    <group position={position}>
+      {/* Tree trunk */}
+      <mesh position={[0, -0.75, 0]}>
+        <cylinderGeometry args={[0.15, 0.2, 1.5, 8]} />
+        <meshStandardMaterial
+          color="#4a148c"
+          emissive="#4a148c"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+
+      {/* Tree foliage - spherical crown with multiple spheres */}
+      <mesh position={[0, 0.5, 0]}>
+        <sphereGeometry args={[0.8, 8, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.4}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0.4, 0.3, 0.3]}>
+        <sphereGeometry args={[0.6, 8, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.5}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      <mesh position={[-0.4, 0.4, -0.2]}>
+        <sphereGeometry args={[0.55, 8, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.45}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0.2, 0.7, -0.3]}>
+        <sphereGeometry args={[0.5, 8, 8]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.5}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+    </group>
+  )
+}
+
 function Boxes() {
   return (
     <>
@@ -431,7 +492,7 @@ function Scene() {
       {/* Grid on top of floor */}
       <gridHelper args={[16, 16, '#ff00ff', '#00ffff']} position={[0, -2.24, 0]} />
 
-      {/* Trees */}
+      {/* Trees - Pine trees */}
       <Tree position={[-4, -0.75, -3]} color="#ff00ff" />
       <Tree position={[5, -0.75, -2]} color="#00ffff" />
       <Tree position={[-3, -0.75, 2]} color="#ff1493" />
@@ -440,6 +501,13 @@ function Scene() {
       <Tree position={[3, -0.75, -4]} color="#ff1493" />
       <Tree position={[-2, -0.75, -5]} color="#ff00ff" />
       <Tree position={[6, -0.75, -4]} color="#00ffff" />
+
+      {/* Regular trees - with round foliage */}
+      <RegularTree position={[-5, -0.75, 2]} color="#ff00ff" />
+      <RegularTree position={[4, -0.75, -2]} color="#00ffff" />
+      <RegularTree position={[-2, -0.75, -3]} color="#ff1493" />
+      <RegularTree position={[7, -0.75, 1]} color="#ff00ff" />
+      <RegularTree position={[-7, -0.75, -3]} color="#00ffff" />
 
       {/* Boxes */}
       <Boxes />
