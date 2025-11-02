@@ -63,48 +63,59 @@ function Grid() {
 
 function Box() {
   const groupRef = useRef()
-  const [isDragging, setIsDragging] = useState(false)
-  const [previousMouse, setPreviousMouse] = useState({ x: 0, y: 0 })
-  const rotation = useRef({ x: 0, y: 0 })
+  const isDragging = useRef(false)
+  const previousMouse = useRef({ x: 0, y: 0 })
+  const targetRotation = useRef({ x: 0, y: 0 })
+  const currentRotation = useRef({ x: 0, y: 0 })
 
-  const handlePointerDown = (event) => {
-    setIsDragging(true)
-    setPreviousMouse({ x: event.clientX, y: event.clientY })
-  }
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      isDragging.current = true
+      previousMouse.current = { x: event.clientX, y: event.clientY }
+    }
 
-  const handlePointerUp = () => {
-    setIsDragging(false)
-  }
+    const handlePointerUp = () => {
+      isDragging.current = false
+    }
 
-  const handlePointerMove = (event) => {
-    if (!isDragging) return
+    const handlePointerMove = (event) => {
+      if (!isDragging.current) return
 
-    const deltaX = event.clientX - previousMouse.x
-    const deltaY = event.clientY - previousMouse.y
+      const deltaX = event.clientX - previousMouse.current.x
+      const deltaY = event.clientY - previousMouse.current.y
 
-    // Update rotation based on mouse delta
-    rotation.current.y += deltaX * 0.01
-    rotation.current.x += deltaY * 0.01
+      // Update target rotation based on mouse delta
+      targetRotation.current.y += deltaX * 0.01
+      targetRotation.current.x += deltaY * 0.01
 
-    setPreviousMouse({ x: event.clientX, y: event.clientY })
-  }
+      previousMouse.current = { x: event.clientX, y: event.clientY }
+    }
 
-  // Apply rotation to entire group
+    window.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointermove', handlePointerMove)
+
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointermove', handlePointerMove)
+    }
+  }, [])
+
+  // Apply smooth rotation with interpolation
   useFrame(() => {
     if (groupRef.current) {
-      groupRef.current.rotation.x = rotation.current.x
-      groupRef.current.rotation.y = rotation.current.y
+      // Smooth interpolation (lerp) for smoother rotation
+      currentRotation.current.x += (targetRotation.current.x - currentRotation.current.x) * 0.15
+      currentRotation.current.y += (targetRotation.current.y - currentRotation.current.y) * 0.15
+
+      groupRef.current.rotation.x = currentRotation.current.x
+      groupRef.current.rotation.y = currentRotation.current.y
     }
   })
 
   return (
-    <group
-      ref={groupRef}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerUp}
-    >
+    <group ref={groupRef}>
       <mesh>
         <boxGeometry args={[2, 2, 2]} />
         <meshStandardMaterial
@@ -125,14 +136,14 @@ function Box() {
         color="#ffff00"
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.05}
+        outlineWidth={0.02}
         outlineColor="#ff00ff"
       >
         DigitAI Geeks
         <meshStandardMaterial
           color="#ffff00"
           emissive="#ffff00"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.3}
           metalness={0.8}
           roughness={0.2}
         />
