@@ -1,9 +1,17 @@
 import { useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 import './App.css'
+
+function Grid() {
+  return (
+    <gridHelper args={[20, 20, '#ff00ff', '#00ffff']} position={[0, -2, 0]} />
+  )
+}
 
 function Box() {
   const meshRef = useRef()
+  const edgesRef = useRef()
   const [isDragging, setIsDragging] = useState(false)
   const [previousMouse, setPreviousMouse] = useState({ x: 0, y: 0 })
   const rotation = useRef({ x: 0, y: 0 })
@@ -35,51 +43,70 @@ function Box() {
     if (meshRef.current) {
       meshRef.current.rotation.x = rotation.current.x
       meshRef.current.rotation.y = rotation.current.y
+      edgesRef.current.rotation.x = rotation.current.x
+      edgesRef.current.rotation.y = rotation.current.y
     }
   })
 
   return (
-    <mesh
-      ref={meshRef}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerUp}
-    >
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial
-        color="#1a237e"
-        metalness={0.2}
-        roughness={0.7}
-        flatShading={false}
-      />
-    </mesh>
+    <group>
+      <mesh
+        ref={meshRef}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerUp}
+      >
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial
+          color="#ff1493"
+          emissive="#ff1493"
+          emissiveIntensity={0.2}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </mesh>
+      <lineSegments ref={edgesRef}>
+        <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
+        <lineBasicMaterial color="#00ffff" linewidth={2} />
+      </lineSegments>
+    </group>
   )
 }
 
 function App() {
   return (
-    <div style={{ width: '100vw', height: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={1.5} />
-        <directionalLight position={[-3, -3, -3]} intensity={0.5} />
-        <pointLight position={[0, 10, 0]} intensity={0.8} color="#a78bfa" />
+    <div style={{
+      width: '100vw',
+      height: '100vh',
+      background: 'linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #2d1b4e 100%)'
+    }}>
+      <Canvas camera={{ position: [0, 1, 6], fov: 60 }}>
+        <ambientLight intensity={0.2} />
+        <pointLight position={[5, 5, 5]} intensity={1.5} color="#ff00ff" />
+        <pointLight position={[-5, 3, -5]} intensity={1.2} color="#00ffff" />
+        <pointLight position={[0, -5, 0]} intensity={0.8} color="#ff1493" />
+        <spotLight position={[0, 10, 0]} intensity={2} color="#ff00ff" angle={0.6} penumbra={1} />
+        <Grid />
         <Box />
+        <fog attach="fog" args={['#1a0033', 5, 20]} />
       </Canvas>
       <div style={{
         position: 'absolute',
         bottom: '40px',
         left: '50%',
         transform: 'translateX(-50%)',
-        color: 'white',
+        color: '#00ffff',
         fontSize: '18px',
         textAlign: 'center',
         padding: '15px 30px',
-        background: 'rgba(255, 255, 255, 0.1)',
+        background: 'rgba(255, 0, 255, 0.1)',
         borderRadius: '10px',
         backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)'
+        border: '2px solid #ff00ff',
+        boxShadow: '0 0 20px rgba(255, 0, 255, 0.5)',
+        fontWeight: 'bold',
+        textShadow: '0 0 10px #00ffff'
       }}>
         Click and drag to rotate the box
       </div>
